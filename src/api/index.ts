@@ -40,7 +40,8 @@ export function fetchChatAPIProcess<T = any>(
       ...data,
       systemMessage: settingStore.systemMessage,
       temperature: settingStore.temperature,
-      top_p: settingStore.top_p,
+      topP: settingStore.top_p,
+      apiModel: settingStore.api_model,
     }
   }
 
@@ -62,5 +63,11 @@ export function fetchVerify<T>(token: string) {
   return post<T>({
     url: '/verify',
     data: { token },
+  })
+}
+
+export function fetchReource<T>() {
+  return post<T>({
+    url: '/resource',
   })
 }

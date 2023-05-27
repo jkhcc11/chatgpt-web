@@ -13,8 +13,9 @@ import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore } from '@/store'
-import { fetchChatAPIProcess } from '@/api'
+import { fetchChatAPIProcess, fetchReource } from '@/api'
 import { t } from '@/locales'
+import type { UserInfo } from '@/store/modules/user/helper'
 
 let controller = new AbortController()
 
@@ -25,6 +26,7 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
+// const userStore = await useUserStore()
 
 const { isMobile } = useBasicLayout()
 const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
@@ -35,6 +37,8 @@ const { uuid } = route.params as { uuid: string }
 
 const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
 const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !!item.conversationOptions)))
+// const userInfo = computed(() => userStore.userInfo)
+const userInfo = ref<UserInfo>()
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
@@ -453,6 +457,7 @@ const footerClass = computed(() => {
 
 onMounted(() => {
   scrollToBottom()
+  fetchResource()
   if (inputRef.value && !isMobile.value)
     inputRef.value?.focus()
 })
@@ -461,6 +466,17 @@ onUnmounted(() => {
   if (loading.value)
     controller.abort()
 })
+
+async function fetchResource() {
+  try {
+    loading.value = true
+    const { data } = await fetchReource<UserInfo>()
+    userInfo.value = data
+  }
+  finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -479,9 +495,16 @@ onUnmounted(() => {
           :class="[isMobile ? 'p-2' : 'p-4']"
         >
           <template v-if="!dataSources.length">
-            <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
-              <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
-              <span>Aha~</span>
+            <div class="flex items-center justify-center mt-4 text-left">
+              <!-- <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
+              <span>Aha~</span> -->
+              <ul>
+                <li><abbr class="text-red-700">为防止不明原因站点无法访问，请看左下角，放走丢！</abbr></li>
+                <li>1.每天gpt3和gpt4均有免费共享额度</li>
+                <li>2.目前此站点可用模型，请点击左下角设置，选择对应模型</li>
+                <li><abbr class="text-red-700">3.若使用gpt-4且是gpt-4卡密时，请点击左下角设置，把模型更换为gpt-4</abbr></li>
+                <li><a :href="userInfo?.cardShopUrl" target="_blank" class="text-blue-500">购买卡密</a></li>
+              </ul>
             </div>
           </template>
           <template v-else>

@@ -1,4 +1,4 @@
-import { ss } from '@/utils/storage'
+import { fetchReource } from '@/api'
 
 const LOCAL_NAME = 'userStorage'
 
@@ -6,27 +6,34 @@ export interface UserInfo {
   avatar: string
   name: string
   description: string
+  shopUrl: string
+  cardShopUrl: string
+  wxremark: string
+  freeCode: string
+  freeCode4: string // gpt4免费卡密
+  wximg: string
+  supportModel: any
+  everyDayFreeTimes: number
+  everyDayFreeTimes4: number
 }
 
 export interface UserState {
   userInfo: UserInfo
 }
 
-export function defaultSetting(): UserState {
+export async function defaultSetting(): Promise<UserState> {
+  const serverConfig = await fetchReource<UserInfo>()
+
   return {
-    userInfo: {
-      avatar: 'https://raw.githubusercontent.com/Chanzhaoyu/chatgpt-web/main/src/assets/avatar.jpg',
-      name: 'ChenZhaoYu',
-      description: 'Star on <a href="https://github.com/Chanzhaoyu/chatgpt-bot" class="text-blue-500" target="_blank" >GitHub</a>',
-    },
+    userInfo: serverConfig.data,
   }
 }
 
-export function getLocalState(): UserState {
-  const localSetting: UserState | undefined = ss.get(LOCAL_NAME)
-  return { ...defaultSetting(), ...localSetting }
-}
+// export function getLocalState(): Promise<UserState> {
+//   const localSetting: UserState | undefined = ss.get(LOCAL_NAME)
+//   return { ...defaultSetting(), ...localSetting }
+// }
 
-export function setLocalState(setting: UserState): void {
-  ss.set(LOCAL_NAME, setting)
-}
+// export function setLocalState(setting: UserState): void {
+//   ss.set(LOCAL_NAME, setting)
+// }
