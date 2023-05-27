@@ -13,9 +13,10 @@ import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore } from '@/store'
-import { fetchChatAPIProcess, fetchReource } from '@/api'
+import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 import type { UserInfo } from '@/store/modules/user/helper'
+import { getLocalReource } from '@/store/modules/user/helper'
 
 let controller = new AbortController()
 
@@ -26,7 +27,7 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
-// const userStore = await useUserStore()
+// const userResource = useUserResource()
 
 const { isMobile } = useBasicLayout()
 const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
@@ -37,8 +38,7 @@ const { uuid } = route.params as { uuid: string }
 
 const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
 const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !!item.conversationOptions)))
-// const userInfo = computed(() => userStore.userInfo)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
@@ -470,7 +470,7 @@ onUnmounted(() => {
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {

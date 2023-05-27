@@ -1,10 +1,11 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref } from 'vue'
 import { NButton, NInput, NModal, useMessage } from 'naive-ui'
-import { fetchReource, fetchVerify } from '@/api'
+import { fetchVerify } from '@/api'
 import { useAuthStore } from '@/store'
 import Icon403 from '@/icons/403.vue'
 import type { UserInfo } from '@/store/modules/user/helper'
+import { getLocalReource } from '@/store/modules/user/helper'
 
 interface Props {
   visible: boolean
@@ -22,7 +23,7 @@ const token = ref('')
 
 const disabled = computed(() => !token.value.trim() || loading.value)
 // const userInfo = computed(() => userStore.userInfo)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 async function handleVerify() {
   const secretKey = token.value.trim()
@@ -57,7 +58,7 @@ function handlePress(event: KeyboardEvent) {
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {

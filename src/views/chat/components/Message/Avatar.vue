@@ -4,7 +4,7 @@ import { NAvatar } from 'naive-ui'
 import { isString } from '@/utils/is'
 import defaultAvatar from '@/assets/avatar.jpg'
 import type { UserInfo } from '@/store/modules/user/helper'
-import { fetchReource } from '@/api'
+import { getLocalReource } from '@/store/modules/user/helper'
 
 interface Props {
   image?: boolean
@@ -14,12 +14,12 @@ defineProps<Props>()
 // const userStore = await useUserStore()
 // const avatar = computed(() => userStore.userInfo.avatar)
 const loading = ref(false)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {

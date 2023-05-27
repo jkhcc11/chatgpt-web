@@ -5,7 +5,7 @@ import { useSettingStore } from '@/store'
 import type { SettingsState } from '@/store/modules/settings/helper'
 import { t } from '@/locales'
 import type { UserInfo } from '@/store/modules/user/helper'
-import { fetchReource } from '@/api'
+import { getLocalReource } from '@/store/modules/user/helper'
 
 const settingStore = useSettingStore()
 
@@ -18,7 +18,7 @@ const temperature = ref(settingStore.temperature ?? 0.5)
 const top_p = ref(settingStore.top_p ?? 1)
 const api_model = ref(settingStore.api_model ?? 'gpt-3.5-turbo')
 
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 const loading = ref(false)
 
 // 多模型
@@ -38,8 +38,8 @@ function handleReset() {
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
-    modelOptions.value = data.supportModel
+    const data = await getLocalReource()
+    modelOptions.value = data?.supportModel
 
     userInfo.value = data
   }

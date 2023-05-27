@@ -5,10 +5,10 @@ import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
 import { useAppStore } from '@/store'
 import type { UserInfo } from '@/store/modules/user/helper'
+import { getLocalReource } from '@/store/modules/user/helper'
 import { getCurrentDate } from '@/utils/functions'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
-import { fetchReource } from '@/api'
 
 const appStore = useAppStore()
 // const userStore = await useUserStore()
@@ -21,7 +21,7 @@ const theme = computed(() => appStore.theme)
 
 // const userInfo = computed(() => userStore.userInfo)
 const loading = ref(false)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 // const avatar = ref(userInfo.value.avatar ?? '')
 // const name = ref(userInfo.value.name ?? '')
@@ -125,7 +125,7 @@ function handleImportButtonClick(): void {
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {

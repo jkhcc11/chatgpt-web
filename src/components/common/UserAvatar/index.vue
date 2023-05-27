@@ -3,20 +3,16 @@ import { onMounted, ref } from 'vue'
 import { NAvatar } from 'naive-ui'
 import defaultAvatar from '@/assets/avatar.jpg'
 import { isString } from '@/utils/is'
-import { fetchReource } from '@/api'
 import type { UserInfo } from '@/store/modules/user/helper'
-
-// const userStore = await useUserStore()
-
-// const userInfo = computed(() => userStore.userInfo)
+import { getLocalReource } from '@/store/modules/user/helper'
 
 const loading = ref(false)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {

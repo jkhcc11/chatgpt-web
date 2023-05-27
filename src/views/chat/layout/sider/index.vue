@@ -8,13 +8,13 @@ import { useAppStore, useChatStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { PromptStore } from '@/components/common'
 import type { UserInfo } from '@/store/modules/user/helper'
-import { fetchReource } from '@/api'
+import { getLocalReource } from '@/store/modules/user/helper'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
 
 const loading = ref(false)
-const userInfo = ref<UserInfo>()
+const userInfo = ref<UserInfo | null>()
 
 const { isMobile } = useBasicLayout()
 const show = ref(false)
@@ -65,7 +65,7 @@ watch(
 async function fetchResource() {
   try {
     loading.value = true
-    const { data } = await fetchReource<UserInfo>()
+    const data = await getLocalReource()
     userInfo.value = data
   }
   finally {
