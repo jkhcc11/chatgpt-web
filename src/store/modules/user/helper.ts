@@ -1,6 +1,6 @@
 import { fetchReource } from '@/api'
 
-const LOCAL_NAME = 'userStorage'
+// const LOCAL_NAME = 'userStorage'
 
 export interface UserInfo {
   avatar: string

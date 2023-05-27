@@ -62,13 +62,13 @@ const languageOptions: { label: string; key: Language; value: Language }[] = [
   // { label: 'Русский язык', key: 'ru-RU', value: 'ru-RU' },
 ]
 
-function updateUserInfo(options: Partial<UserInfo>) {
-  userStore.updateUserInfo(options)
-  ms.success(t('common.success'))
-}
+// function updateUserInfo(options: Partial<UserInfo>) {
+//   userStore.updateUserInfo(options)
+//   ms.success(t('common.success'))
+// }
 
 function handleReset() {
-  userStore.resetUserInfo()
+  // userStore.resetUserInfo()
   ms.success(t('common.success'))
   window.location.reload()
 }
