@@ -7,8 +7,7 @@ export interface UserInfo {
   avatar: string
   name: string
   description: string
-  shopUrl: string
-  cardShopUrl: string
+  homeBtnHtml: string
   wxremark: string
   freeCode: string
   freeCode4: string // gpt4免费卡密

@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NAutoComplete, NButton, NInput, useDialog, useMessage } from 'naive-ui'
+import { NAutoComplete, NButton, NInput, NSelect, useDialog, useMessage } from 'naive-ui'
 import html2canvas from 'html2canvas'
 import { Message } from './components'
 import { useScroll } from './hooks/useScroll'
@@ -12,11 +12,12 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore } from '@/store'
+import { useChatStore, usePromptStore, useSettingStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 import type { UserInfo } from '@/store/modules/user/helper'
 import { getLocalReource } from '@/store/modules/user/helper'
+import { isString } from '@/utils/is'
 
 let controller = new AbortController()
 
@@ -46,6 +47,11 @@ const inputRef = ref<Ref | null>(null)
 
 // 添加PromptStore
 const promptStore = usePromptStore()
+const settingStore = useSettingStore()
+
+// 多模型
+const modelOptions = ref()
+const api_model = ref(settingStore.api_model)
 
 // 使用storeToRefs，保证store修改后，联想部分能够重新渲染
 const { promptList: promptTemplate } = storeToRefs<any>(promptStore)
@@ -55,6 +61,12 @@ dataSources.value.forEach((item, index) => {
   if (item.loading)
     updateChatSome(+uuid, index, { loading: false })
 })
+
+function updateSettings(value: any) {
+  // console.log(value)
+  settingStore.updateSetting({ api_model: value })
+  ms.success(t('common.success'))
+}
 
 function handleSubmit() {
   onConversation()
@@ -471,6 +483,7 @@ async function fetchResource() {
   try {
     loading.value = true
     const data = await getLocalReource()
+    modelOptions.value = data?.supportModel
     userInfo.value = data
   }
   finally {
@@ -499,11 +512,23 @@ async function fetchResource() {
               <!-- <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
               <span>Aha~</span> -->
               <ul>
+                <li>
+                  <NSelect
+                    v-model:value="api_model"
+                    placeholder="选择模型"
+                    :options="modelOptions"
+                    @update:value="updateSettings"
+                  />
+                </li>
                 <li><abbr class="text-red-700">为防止不明原因站点无法访问，请看左下角，放走丢！</abbr></li>
                 <li>1.每天gpt3和gpt4均有免费共享额度</li>
-                <li>2.目前此站点可用模型，请点击左下角设置，选择对应模型</li>
-                <li><abbr class="text-red-700">3.若使用gpt-4且是gpt-4卡密时，请点击左下角设置，把模型更换为gpt-4</abbr></li>
-                <li><a :href="userInfo?.cardShopUrl" target="_blank" class="text-blue-500">购买卡密</a></li>
+                <li><abbr class="text-red-700">2.若使用gpt-4且是gpt-4卡密时，请选择模型为：gpt-4</abbr></li>
+                <li>
+                  <span
+                    v-if="isString(userInfo?.homeBtnHtml) && userInfo?.homeBtnHtml !== ''"
+                    v-html="userInfo?.homeBtnHtml"
+                  />
+                </li>
               </ul>
             </div>
           </template>

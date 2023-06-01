@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store'
 import Icon403 from '@/icons/403.vue'
 import type { UserInfo } from '@/store/modules/user/helper'
 import { getLocalReource } from '@/store/modules/user/helper'
+import { isString } from '@/utils/is'
 
 interface Props {
   visible: boolean
@@ -85,9 +86,10 @@ onMounted(() => {
             <div v-if="userInfo?.freeCode4">
               免费gpt4卡密：<abbr class="text-blue-700">{{ userInfo.freeCode4 }} </abbr>  (每日共享{{ userInfo?.everyDayFreeTimes4 }}次访问)
             </div>
-            <abbr class="text-red-600">由于某些原因,请使用ai1-20(均可).gpt-666.com挨个切换</abbr>
-            <br>
-            <a :href="userInfo?.cardShopUrl" target="_blank" class="text-blue-500">购买卡密</a>
+            <span
+              v-if="isString(userInfo?.homeBtnHtml) && userInfo?.homeBtnHtml !== ''"
+              v-html="userInfo?.homeBtnHtml"
+            />
           </div>
           <Icon403 class="w-[200px] m-auto" />
         </header>
