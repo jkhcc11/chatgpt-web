@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { NButton, NPopconfirm, NSelect, useMessage } from 'naive-ui'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
 import { useAppStore } from '@/store'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
 import { getCurrentDate } from '@/utils/functions'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
@@ -20,8 +18,8 @@ const ms = useMessage()
 const theme = computed(() => appStore.theme)
 
 // const userInfo = computed(() => userStore.userInfo)
-const loading = ref(false)
-const userInfo = ref<UserInfo | null>()
+// const loading = ref(false)
+// const userStore = useUserStore()
 
 // const avatar = ref(userInfo.value.avatar ?? '')
 // const name = ref(userInfo.value.name ?? '')
@@ -121,21 +119,6 @@ function handleImportButtonClick(): void {
   if (fileInput)
     fileInput.click()
 }
-
-async function fetchResource() {
-  try {
-    loading.value = true
-    const data = await getLocalReource()
-    userInfo.value = data
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchResource()
-})
 </script>
 
 <template>

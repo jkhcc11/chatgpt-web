@@ -1,20 +1,17 @@
 <script setup lang='ts'>
 import type { CSSProperties } from 'vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { NButton, NLayoutSider } from 'naive-ui'
 import List from './List.vue'
 import Footer from './Footer.vue'
-import { useAppStore, useChatStore } from '@/store'
+import { useAppStore, useChatStore, useUserStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { PromptStore } from '@/components/common'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
 
-const loading = ref(false)
-const userInfo = ref<UserInfo | null>()
+const userStore = useUserStore()
 
 const { isMobile } = useBasicLayout()
 const show = ref(false)
@@ -61,21 +58,6 @@ watch(
     flush: 'post',
   },
 )
-
-async function fetchResource() {
-  try {
-    loading.value = true
-    const data = await getLocalReource()
-    userInfo.value = data
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchResource()
-})
 </script>
 
 <template>
@@ -106,7 +88,7 @@ onMounted(() => {
           </NButton>
         </div>
         <div class="p-1">
-          <img :src="userInfo?.wximg" style="height:120px">  <abbr class="text-red-400 ">备注：{{ userInfo?.wxremark }}</abbr>
+          <img :src="userStore.userInfo?.wximg" style="height:120px">  <abbr class="text-red-400 ">备注：{{ userStore.userInfo?.wxremark }}</abbr>
         </div>
       </main>
       <Footer />

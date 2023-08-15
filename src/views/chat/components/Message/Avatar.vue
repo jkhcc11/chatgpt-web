@@ -1,40 +1,19 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
 import { NAvatar } from 'naive-ui'
 import { isString } from '@/utils/is'
 import defaultAvatar from '@/assets/avatar.jpg'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
-
+import { useUserStore } from '@/store'
 interface Props {
   image?: boolean
 }
 defineProps<Props>()
 
-// const userStore = await useUserStore()
-// const avatar = computed(() => userStore.userInfo.avatar)
-const loading = ref(false)
-const userInfo = ref<UserInfo | null>()
-
-async function fetchResource() {
-  try {
-    loading.value = true
-    const data = await getLocalReource()
-    userInfo.value = data
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchResource()
-})
+const userStore = useUserStore()
 </script>
 
 <template>
   <template v-if="image">
-    <NAvatar v-if="isString(userInfo?.avatar) && userInfo?.avatar.length > 0" :src="userInfo?.avatar" :fallback-src="defaultAvatar" />
+    <NAvatar v-if="isString(userStore.userInfo?.avatar) && userStore.userInfo?.avatar.length > 0" :src="userStore.userInfo?.avatar" :fallback-src="defaultAvatar" />
     <NAvatar v-else round :src="defaultAvatar" />
   </template>
   <span v-else class="text-[28px] dark:text-white">

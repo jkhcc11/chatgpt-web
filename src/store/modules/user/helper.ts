@@ -1,7 +1,7 @@
 import { fetchReource } from '@/api'
 import { ssHour } from '@/utils/storage'
 
-const LOCAL_NAME = 'Resource'
+const LOCAL_NAME = 'Resource-New'
 
 export interface UserInfo {
   avatar: string
@@ -18,7 +18,13 @@ export interface UserInfo {
 }
 
 export interface UserState {
-  userInfo: UserInfo
+  userInfo: UserInfo | null
+}
+
+export function defaultSetting(): UserState {
+  return {
+    userInfo: null as UserInfo | null,
+  }
 }
 
 export async function getLocalReource(): Promise<UserInfo | null> {
@@ -26,16 +32,19 @@ export async function getLocalReource(): Promise<UserInfo | null> {
   if (cachedData)
     return Promise.resolve(cachedData)
 
-  return fetchReource<UserInfo>()
-    .then((result) => {
-      ssHour.set(LOCAL_NAME, result.data)
-      return result.data
-    }).catch((error) => {
-      console.error(error)
-      return null
-    })
+  const apiReource = await fetchReource<UserInfo>()
+  ssHour.set(LOCAL_NAME, apiReource.data)
+  return apiReource.data
+  // return fetchReource<UserInfo>()
+  //   .then((result) => {
+  //     ssHour.set(LOCAL_NAME, result.data)
+  //     return result.data
+  //   }).catch((error) => {
+  //     console.error(error)
+  //     return null
+  //   })
 }
 
-// export function setLocalState(setting: UserState): void {
-//   ss.set(LOCAL_NAME, setting)
+// export function setLocalState(userInfo: UserInfo): void {
+//   ssHour.set(LOCAL_NAME, userInfo)
 // }

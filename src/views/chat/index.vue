@@ -12,11 +12,9 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore, useSettingStore } from '@/store'
+import { useChatStore, usePromptStore, useSettingStore, useUserStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
 import { isString } from '@/utils/is'
 
 let controller = new AbortController()
@@ -28,7 +26,7 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
-// const userResource = useUserResource()
+const userStore = useUserStore()
 
 const { isMobile } = useBasicLayout()
 const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
@@ -39,7 +37,7 @@ const { uuid } = route.params as { uuid: string }
 
 const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
 const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !!item.conversationOptions)))
-const userInfo = ref<UserInfo | null>()
+// const userInfo = ref<UserInfo | null>()
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
@@ -49,8 +47,6 @@ const inputRef = ref<Ref | null>(null)
 const promptStore = usePromptStore()
 const settingStore = useSettingStore()
 
-// 多模型
-const modelOptions = ref()
 const api_model = ref(settingStore.api_model)
 
 // 使用storeToRefs，保证store修改后，联想部分能够重新渲染
@@ -469,7 +465,6 @@ const footerClass = computed(() => {
 
 onMounted(() => {
   scrollToBottom()
-  fetchResource()
   if (inputRef.value && !isMobile.value)
     inputRef.value?.focus()
 })
@@ -478,18 +473,6 @@ onUnmounted(() => {
   if (loading.value)
     controller.abort()
 })
-
-async function fetchResource() {
-  try {
-    loading.value = true
-    const data = await getLocalReource()
-    modelOptions.value = data?.supportModel
-    userInfo.value = data
-  }
-  finally {
-    loading.value = false
-  }
-}
 </script>
 
 <template>
@@ -516,7 +499,7 @@ async function fetchResource() {
                   <NSelect
                     v-model:value="api_model"
                     placeholder="选择模型"
-                    :options="modelOptions"
+                    :options="userStore.userInfo?.supportModel"
                     @update:value="updateSettings"
                   />
                 </li>
@@ -525,8 +508,8 @@ async function fetchResource() {
                 <li><abbr class="text-red-700">2.若使用gpt-4且是gpt-4卡密时，请选择模型为：gpt-4</abbr></li>
                 <li>
                   <span
-                    v-if="isString(userInfo?.homeBtnHtml) && userInfo?.homeBtnHtml !== ''"
-                    v-html="userInfo?.homeBtnHtml"
+                    v-if="isString(userStore.userInfo?.homeBtnHtml) && userStore.userInfo?.homeBtnHtml !== ''"
+                    v-html="userStore.userInfo?.homeBtnHtml"
                   />
                 </li>
               </ul>
