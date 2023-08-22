@@ -1,10 +1,13 @@
-// export const useUserResource = defineStore('setting-resource', {
-//   state: (): UserInfo => getLocalState(),
-//   actions: {
+import { defineStore } from 'pinia'
+import type { UserState } from './helper'
+import { defaultSetting, getLocalReource } from './helper'
 
-//   },
-// },
-// )
-// export async function useUserStore(): Promise<UserState> {
-//   return await defaultSetting()
-// }
+export const useUserStore = defineStore('local-reource-store', {
+  state: (): UserState => defaultSetting(),
+  actions: {
+    async initApiConfig() {
+      if (this.userInfo == null)
+        this.userInfo = await getLocalReource()
+    },
+  },
+})

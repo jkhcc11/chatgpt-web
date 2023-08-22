@@ -2,10 +2,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { NButton, NInput, NModal, useMessage } from 'naive-ui'
 import { fetchVerify } from '@/api'
-import { useAuthStore } from '@/store'
+import { useAuthStore, useUserStore } from '@/store'
 import Icon403 from '@/icons/403.vue'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
+import { isString } from '@/utils/is'
 
 interface Props {
   visible: boolean
@@ -14,7 +13,6 @@ interface Props {
 defineProps<Props>()
 
 const authStore = useAuthStore()
-// const userStore = await useUserStore()
 
 const ms = useMessage()
 
@@ -23,7 +21,7 @@ const token = ref('')
 
 const disabled = computed(() => !token.value.trim() || loading.value)
 // const userInfo = computed(() => userStore.userInfo)
-const userInfo = ref<UserInfo | null>()
+const userStore = useUserStore()
 
 async function handleVerify() {
   const secretKey = token.value.trim()
@@ -55,11 +53,11 @@ function handlePress(event: KeyboardEvent) {
   }
 }
 
+// 只需要在这里初始化一次 即可
 async function fetchResource() {
   try {
     loading.value = true
-    const data = await getLocalReource()
-    userInfo.value = data
+    await userStore.initApiConfig()
   }
   finally {
     loading.value = false
@@ -81,13 +79,14 @@ onMounted(() => {
           </h2>
           <div class="text-base text-left text-slate-500 dark:text-slate-500">
             <abbr class="text-red-600">未授权，请输入卡密并确保卡密和模型匹配。</abbr> <br>
-            免费gpt3卡密：<abbr class="text-blue-700">{{ userInfo?.freeCode }} </abbr>  (每日共享{{ userInfo?.everyDayFreeTimes }}次访问)<br>
-            <div v-if="userInfo?.freeCode4">
-              免费gpt4卡密：<abbr class="text-blue-700">{{ userInfo.freeCode4 }} </abbr>  (每日共享{{ userInfo?.everyDayFreeTimes4 }}次访问)
+            免费gpt3卡密：<abbr class="text-blue-700">{{ userStore.userInfo?.freeCode }} </abbr>  (每日共享{{ userStore.userInfo?.everyDayFreeTimes }}次访问)<br>
+            <div v-if="userStore.userInfo?.freeCode4">
+              免费gpt4卡密：<abbr class="text-blue-700">{{ userStore.userInfo.freeCode4 }} </abbr>  (每日共享{{ userStore.userInfo?.everyDayFreeTimes4 }}次访问)
             </div>
-            <abbr class="text-red-600">由于某些原因,请使用ai1-20(均可).gpt-666.com挨个切换</abbr>
-            <br>
-            <a :href="userInfo?.cardShopUrl" target="_blank" class="text-blue-500">购买卡密</a>
+            <span
+              v-if="isString(userStore.userInfo?.homeBtnHtml) && userStore.userInfo?.homeBtnHtml !== ''"
+              v-html="userStore.userInfo?.homeBtnHtml"
+            />
           </div>
           <Icon403 class="w-[200px] m-auto" />
         </header>

@@ -1,14 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { NButton, NInput, NSelect, NSlider, NSpin, useMessage } from 'naive-ui'
-import { useSettingStore } from '@/store'
+import { useSettingStore, useUserStore } from '@/store'
 import type { SettingsState } from '@/store/modules/settings/helper'
 import { t } from '@/locales'
-import type { UserInfo } from '@/store/modules/user/helper'
-import { getLocalReource } from '@/store/modules/user/helper'
 
 const settingStore = useSettingStore()
-
 const ms = useMessage()
 
 const systemMessage = ref(settingStore.systemMessage ?? '')
@@ -18,11 +15,8 @@ const temperature = ref(settingStore.temperature ?? 0.5)
 const top_p = ref(settingStore.top_p ?? 1)
 const api_model = ref(settingStore.api_model ?? 'gpt-3.5-turbo')
 
-const userInfo = ref<UserInfo | null>()
+const userStore = useUserStore()
 const loading = ref(false)
-
-// 多模型
-const modelOptions = ref()
 
 function updateSettings(options: Partial<SettingsState>) {
   settingStore.updateSetting(options)
@@ -38,10 +32,7 @@ function handleReset() {
 async function fetchResource() {
   try {
     loading.value = true
-    const data = await getLocalReource()
-    modelOptions.value = data?.supportModel
-
-    userInfo.value = data
+    await userStore.initApiConfig()
   }
   finally {
     loading.value = false
@@ -91,7 +82,7 @@ onMounted(() => {
           <div class="flex-1">
             <NSelect
               v-model:value="api_model"
-              :options="modelOptions"
+              :options="userStore.userInfo?.supportModel"
             />
           </div>
           <NButton size="tiny" text type="primary" @click="updateSettings({ api_model })">
