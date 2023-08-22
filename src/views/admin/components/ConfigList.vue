@@ -38,23 +38,7 @@ const formRules = {
     trigger: ['blur', 'input'],
     message: '必填',
   },
-  freeCode4: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '必填',
-  },
   freeTimesWith3: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '必填',
-    validator(rule: FormItemRule, value: number) {
-      if (!value
-      || value <= 0)
-        return new Error('必填')
-      return true
-    },
-  },
-  freeTimesWith4: {
     required: true,
     trigger: ['blur', 'input'],
     message: '必填',

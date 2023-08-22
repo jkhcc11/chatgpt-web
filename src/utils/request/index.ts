@@ -19,6 +19,7 @@ export interface Response<T = any> {
   status: string
   isSuccess: boolean
   msg: string | null
+  resultCode: number
 }
 
 function http<T = any>(
