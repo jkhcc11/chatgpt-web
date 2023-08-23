@@ -16,6 +16,7 @@ import { createAndUpdateCardType, deleteCardType, queryCardType } from '@/api'
 import { supportModelGroupNames } from '@/utils/consts'
 
 // 生成
+const loading = ref(false)
 const currentEditData = ref({
   id: null,
   cardTypeName: '',
@@ -137,7 +138,7 @@ const createEditColumns = (): DataTableColumns<any> => {
         return h(NInputNumber, {
           value: rowData.maxResponseTokens,
           min: 0,
-          placeholder: '最大返回Tokens',
+          placeholder: '最大返回Tokens 为空按官方',
           onUpdateValue: (newVal: any) => {
             rowData.maxResponseTokens = newVal
           },
@@ -174,14 +175,18 @@ const onDelete = async (rowData: any) => {
     content: '是否要删除该条数据？',
     positiveText: '删除',
     onPositiveClick: async () => {
-      const reqResult = await deleteCardType<any>({ id: rowData.id })
-      if (reqResult.isSuccess) {
+      try {
+        loading.value = true
+        const reqResult = await deleteCardType<any>({ id: rowData.id })
         message.success(reqResult.message)
         await queryRef.value?.onRefresh()
-        return
       }
-
-      message.error(reqResult.message)
+      catch (error: any) {
+        message.error(error.message)
+      }
+      finally {
+        loading.value = false
+      }
     },
   })
 }
@@ -316,15 +321,18 @@ const onSave = () => {
         limitItems: limitItems.value,
       }
 
-      const reqResult = await createAndUpdateCardType<any>(pd)
-      if (reqResult.isSuccess) {
-        await queryRef.value?.closeDialog()
+      try {
+        loading.value = true
+        const reqResult = await createAndUpdateCardType<any>(pd)
         message.success(reqResult.message)
-        return
+        await queryRef.value?.closeDialog()
       }
-
-      message.error(reqResult.message)
-      // console.log('form', currentEditData.value)
+      catch (error: any) {
+        message.error(error.message)
+      }
+      finally {
+        loading.value = false
+      }
     }
   })
 }
@@ -348,6 +356,7 @@ onMounted(() => {
   <CommonQueryList
     ref="queryRef" :on-init-data="initData"
     :on-create-columns="createColumns"
+    :loading="loading"
     @on-create="onCreate"
   >
     <template #showContent>

@@ -6,7 +6,8 @@ import {
   NFormItemGi,
   NGrid,
   NInputNumber,
-  NSelect, useDialog, useMessage,
+  NSelect,
+  NTag, useDialog, useMessage,
 } from 'naive-ui'
 
 import { h, onMounted, ref } from 'vue'
@@ -15,6 +16,7 @@ import { createCardNo, deleteCardNo, queryCardNo } from '@/api'
 import { getAllCardTypeCache } from '@/store/modules/cardType/helper'
 
 // 生成
+const loading = ref(false)
 const currentEditData = ref({ number: 1 })
 const cardTypeOptions = ref([])
 const formRef = ref<FormInst | null>(null)
@@ -51,14 +53,18 @@ const onDelete = async (rowData: any) => {
     content: '是否要删除该条数据？',
     positiveText: '删除',
     onPositiveClick: async () => {
-      const reqResult = await deleteCardNo<any>({ id: rowData.id })
-      if (reqResult.isSuccess) {
+      try {
+        loading.value = true
+        const reqResult = await deleteCardNo<any>({ id: rowData.id })
         message.success(reqResult.message)
         await queryRef.value?.onRefresh()
-        return
       }
-
-      message.error(reqResult.message)
+      catch (error: any) {
+        message.error(error.message)
+      }
+      finally {
+        loading.value = false
+      }
     },
   })
 }
@@ -76,6 +82,17 @@ const createColumns = (): DataTableColumns<any> => {
     {
       title: '激活时间',
       key: 'activateTime',
+    },
+    {
+      title: '是否过期',
+      key: 'isExpired',
+      render: (rowData: any) => {
+        return h(NTag, {
+          type: rowData.isExpired ? 'error' : 'success',
+        }, {
+          default: () => rowData.isExpired ? '是' : '否',
+        })
+      },
     },
     {
       title: '创建时间',
@@ -109,15 +126,18 @@ const createColumns = (): DataTableColumns<any> => {
 const onSave = () => {
   formRef.value?.validate(async (errors) => {
     if (!errors) {
-      const reqResult = await createCardNo<any>(currentEditData.value)
-      if (reqResult.isSuccess) {
-        await queryRef.value?.closeDialog()
+      try {
+        loading.value = true
+        const reqResult = await createCardNo<any>(currentEditData.value)
         message.success(reqResult.message)
-        return
+        await queryRef.value?.closeDialog()
       }
-
-      message.error(reqResult.message)
-      // console.log('form', currentEditData.value)
+      catch (error: any) {
+        message.error(error.message)
+      }
+      finally {
+        loading.value = false
+      }
     }
   })
 }
@@ -145,6 +165,7 @@ onMounted(() => {
   <CommonQueryList
     ref="queryRef" :on-init-data="initData"
     :on-create-columns="createColumns"
+    :loading="loading"
     @on-create="onCreate"
   >
     <template #showContent>

@@ -9,6 +9,7 @@ import {
   NModal,
   NPagination,
   NSpace,
+  NSpin,
 } from 'naive-ui'
 
 import { defineProps, onMounted, reactive, ref } from 'vue'
@@ -21,7 +22,9 @@ const props = defineProps({
   onCreateColumns: {
     type: Function,
   },
-
+  loading: {
+    type: Boolean,
+  },
 })
 
 const emit = defineEmits<Emit>()
@@ -162,7 +165,9 @@ defineExpose({
 
   <NModal v-model:show="showModal" style="width: 60%;" preset="card" title="操作">
     <NSpace vertical>
-      <slot name="showContent" />
+      <NSpin :show="loading">
+        <slot name="showContent" />
+      </NSpin>
     </NSpace>
   </NModal>
 </template>
