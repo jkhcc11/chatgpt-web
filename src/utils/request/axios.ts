@@ -25,6 +25,21 @@ service.interceptors.response.use(
     throw new Error(response.status.toString())
   },
   (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      const authStore = useAuthStore()
+      authStore.removeToken()
+      if (error.response.status === 403
+        || location.hash === '#/admin') {
+        // admin特殊处理
+        window.location.href = '/'
+        return
+      }
+
+      // 普通
+      window.location.reload()
+    }
+    // throw new Error(error)
+    // console.log('res', error)
     return Promise.reject(error)
   },
 )

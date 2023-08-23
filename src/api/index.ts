@@ -1,5 +1,5 @@
 import type { AxiosProgressEvent, GenericAbortSignal } from 'axios'
-import { post } from '@/utils/request'
+import { get, post, sendDelete } from '@/utils/request'
 import { useAuthStore, useSettingStore } from '@/store'
 
 export function fetchChatAPI<T = any>(
@@ -8,7 +8,7 @@ export function fetchChatAPI<T = any>(
   signal?: GenericAbortSignal,
 ) {
   return post<T>({
-    url: '/chat',
+    url: '/gpt-web-api/chat',
     data: { prompt, options },
     signal,
   })
@@ -16,7 +16,7 @@ export function fetchChatAPI<T = any>(
 
 export function fetchChatConfig<T = any>() {
   return post<T>({
-    url: '/config',
+    url: '/gpt-web-api/config',
   })
 }
 
@@ -46,7 +46,7 @@ export function fetchChatAPIProcess<T = any>(
   }
 
   return post<T>({
-    url: '/chat-process',
+    url: '/gpt-web-api/chat-process',
     data,
     signal: params.signal,
     onDownloadProgress: params.onDownloadProgress,
@@ -55,19 +55,77 @@ export function fetchChatAPIProcess<T = any>(
 
 export function fetchSession<T>() {
   return post<T>({
-    url: '/session',
+    url: '/gpt-web-api/session',
   })
 }
 
 export function fetchVerify<T>(token: string) {
   return post<T>({
-    url: '/verify',
+    url: '/gpt-web-api/verify',
     data: { token },
   })
 }
 
 export function fetchReource<T>() {
   return post<T>({
-    url: '/resource',
+    url: '/gpt-web-api/resource',
+  })
+}
+
+// admin
+export function queryWebConfig<T>(params: any) {
+  return get<T>({
+    url: '/config-v2/query-web-config',
+    data: params,
+  })
+}
+export function saveWebConfig<T>(data: any) {
+  return post<T>({
+    url: '/config-v2/create-update-web-config',
+    data,
+  })
+}
+export function deleteWebConfig<T>(params: any) {
+  return sendDelete<T>({
+    url: '/config-v2/delete-web-config',
+    data: params,
+  })
+}
+
+export function queryCardNo<T>(params: any) {
+  return get<T>({
+    url: '/config-v2/query-activation-code',
+    data: params,
+  })
+}
+export function createCardNo<T>(data: any) {
+  return post<T>({
+    url: '/config-v2/batch-create-activation-code',
+    data,
+  })
+}
+export function deleteCardNo<T>(params: any) {
+  return sendDelete<T>({
+    url: '/config-v2/delete-code',
+    data: params,
+  })
+}
+
+export function queryCardType<T>(params: any) {
+  return get<T>({
+    url: '/config-v2/query-card-type',
+    data: params,
+  })
+}
+export function createAndUpdateCardType<T>(data: any) {
+  return post<T>({
+    url: '/config-v2/create-update-card-type',
+    data,
+  })
+}
+export function deleteCardType<T>(params: any) {
+  return sendDelete<T>({
+    url: '/config-v2/delete-card-type',
+    data: params,
   })
 }

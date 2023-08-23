@@ -504,8 +504,8 @@ onUnmounted(() => {
                   />
                 </li>
                 <li><abbr class="text-red-700">为防止不明原因站点无法访问，请看左下角，放走丢！</abbr></li>
-                <li>1.每天gpt3和gpt4均有免费共享额度</li>
-                <li><abbr class="text-red-700">2.若使用gpt-4且是gpt-4卡密时，请选择模型为：gpt-4</abbr></li>
+                <!-- <li>1.每天gpt3和gpt4均有免费共享额度</li>
+                <li><abbr class="text-red-700">2.若使用gpt-4且是gpt-4卡密时，请选择模型为：gpt-4</abbr></li> -->
                 <li>
                   <span
                     v-if="isString(userStore.userInfo?.homeBtnHtml) && userStore.userInfo?.homeBtnHtml !== ''"
