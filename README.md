@@ -5,6 +5,7 @@
   # 新增功能
   - api模型可在前端获取
   - 卡密校验
+  - 新增管理页面
   
   # 后端代码
   [chatgpt-web-dotnet-api](https://github.com/jkhcc11/chatgpt-web-dotnet-api)
